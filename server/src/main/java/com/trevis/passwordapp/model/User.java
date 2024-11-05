@@ -1,4 +1,4 @@
-package com.trevis.backend.challenge.model;
+package com.trevis.passwordapp.model;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "UserData")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -74,4 +75,5 @@ public class User {
     public void setRequests(Set<PasswordRequest> requests) {
         this.requests = requests;
     }
+    
 }

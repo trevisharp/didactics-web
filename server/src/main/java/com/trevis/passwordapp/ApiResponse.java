@@ -1,3 +1,3 @@
-package com.trevis.backend.challenge;
+package com.trevis.passwordapp;
 
 public record ApiResponse<T>(T data, String message) { }

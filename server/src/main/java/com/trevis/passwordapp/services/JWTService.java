@@ -1,4 +1,4 @@
-package com.trevis.backend.challenge.services;
+package com.trevis.passwordapp.services;
 
 import java.util.Map;
 

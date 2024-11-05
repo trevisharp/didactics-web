@@ -1,8 +1,8 @@
-package com.trevis.backend.challenge.impl;
+package com.trevis.passwordapp.impl;
 
 import java.util.Arrays;
 
-import com.trevis.backend.challenge.services.PasswordValidator;
+import com.trevis.passwordapp.services.PasswordValidator;
 
 public class DefaultPasswordValidator implements PasswordValidator {
 

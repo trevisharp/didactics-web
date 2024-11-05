@@ -1,4 +1,4 @@
-package com.trevis.backend.challenge.model;
+package com.trevis.passwordapp.model;
 
 import java.util.Date;
 import jakarta.persistence.*;
@@ -108,4 +108,5 @@ public class PasswordRequest {
     public void setUser(User user) {
         this.user = user;
     }
+    
 }

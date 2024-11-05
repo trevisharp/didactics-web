@@ -1,4 +1,4 @@
-package com.trevis.backend.challenge.model;
+package com.trevis.passwordapp.model;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -52,4 +52,5 @@ public class Role {
     public void setUsers(Set<User> users) {
         this.users = users;
     }
+    
 }

@@ -1,10 +1,10 @@
-package com.trevis.backend.challenge.impl;
+package com.trevis.passwordapp.impl;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
-import com.trevis.backend.challenge.services.JWTService;
+import com.trevis.passwordapp.services.JWTService;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;

@@ -1,6 +1,6 @@
-package com.trevis.backend.challenge.services;
+package com.trevis.passwordapp.services;
 
-import com.trevis.backend.challenge.model.User;
+import com.trevis.passwordapp.model.User;
 
 public interface UserAuth {
     User loginByUsername(String username);

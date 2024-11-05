@@ -1,4 +1,4 @@
-package com.trevis.backend.challenge;
+package com.trevis.passwordapp;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
