@@ -1,11 +1,8 @@
 package com.trevis.backend.challenge.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import java.util.Set;
+import java.util.HashSet;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "UserData")
@@ -14,14 +11,21 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "Username")
+    @Column
     private String username;
 
-    @Column(name = "Password")
+    @Column
     private String password;
 
-    @Column(name = "Email")
+    @Column
     private String email;
+
+    @ManyToOne
+    @JoinColumn(name = "roleId")
+    private Role role;
+    
+    @OneToMany(mappedBy = "user")
+    private Set<PasswordRequest> requests = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -53,5 +57,21 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public Set<PasswordRequest> getRequests() {
+        return requests;
+    }
+
+    public void setRequests(Set<PasswordRequest> requests) {
+        this.requests = requests;
     }
 }
