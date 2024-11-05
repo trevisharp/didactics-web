@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.trevis.passwordapp.dto.LoginData;
+import com.trevis.passwordapp.dto.Token;
 import com.trevis.passwordapp.dto.UserData;
 import com.trevis.passwordapp.model.User;
 import com.trevis.passwordapp.repositories.RoleRepository;
 import com.trevis.passwordapp.repositories.UserRepository;
+import com.trevis.passwordapp.services.JWTService;
 
 @RestController
 @RequestMapping("/user")
@@ -27,6 +29,9 @@ public class UserController {
 
     @Autowired
     PasswordEncoder encoder;
+
+    @Autowired
+    JWTService<Token> jwtService;
 
     @PostMapping
     public ResponseEntity<String> create(@RequestBody UserData userData) {
@@ -106,8 +111,14 @@ public class UserController {
             );
         }
 
+        Token token = new Token();
+        token.setId(user.getId());
+        token.setRole(user.getRole().getName());
+        
+        var jwt = jwtService.get(token);
+
         return new ResponseEntity<>(
-            "i am a nice jwt!",
+            jwt,
             HttpStatus.OK
         );
     }
