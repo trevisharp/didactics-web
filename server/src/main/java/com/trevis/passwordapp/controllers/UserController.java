@@ -1,88 +1,115 @@
-// package com.trevis.backend.challenge.controllers;
+package com.trevis.passwordapp.controllers;
 
-// import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-// import com.trevis.backend.challenge.model.User;
-// import com.trevis.backend.challenge.dto.LoginData;
-// import com.trevis.backend.challenge.dto.AuthResult;
-// import com.trevis.backend.challenge.dto.JWTUserData;
-// import com.trevis.backend.challenge.services.UserAuth;
-// import com.trevis.backend.challenge.services.JWTService;
+import com.trevis.passwordapp.dto.LoginData;
+import com.trevis.passwordapp.dto.UserData;
+import com.trevis.passwordapp.model.User;
+import com.trevis.passwordapp.repositories.RoleRepository;
+import com.trevis.passwordapp.repositories.UserRepository;
 
-// import org.springframework.http.ResponseEntity;
-// import org.springframework.web.bind.annotation.PostMapping;
-// import org.springframework.web.bind.annotation.RequestBody;
-// import org.springframework.web.bind.annotation.RequestMapping;
+@RestController
+@RequestMapping("/user")
+public class UserController {
 
-// import java.util.HashMap;
+    @Autowired
+    UserRepository repo;
 
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.security.crypto.password.PasswordEncoder;
+    @Autowired
+    RoleRepository rolesRepo;
 
-// @RestController
-// @RequestMapping("/user")
-// public class UserController {
+    @Autowired
+    PasswordEncoder encoder;
 
-//     @Autowired
-//     PasswordEncoder encoder;
+    @PostMapping
+    public ResponseEntity<String> create(@RequestBody UserData userData) {
 
-//     @Autowired
-//     UserAuth auth;
+        if (userData.email() == null || userData.password() == null || userData.username() == null) {
+            return new ResponseEntity<>(
+                "username, email and password are expected.", 
+                HttpStatus.BAD_REQUEST
+            );
+        }
 
-//     @Autowired
-//     JWTService<JWTUserData> jwt;
+        if (!repo.findByEmail(userData.email()).isEmpty()) {
+            return new ResponseEntity<>(
+                "email already is in use.", 
+                HttpStatus.BAD_REQUEST
+            );
+        }
 
-//     @PostMapping("login")
-//     public ResponseEntity<AuthResult> login(
-//         @RequestBody LoginData data) {
-//         var user = auth.loginByEmail(data.login());
-//         user = user != null ? user :
-//             auth.loginByUsername(data.login());
+        if (!repo.findByUsername(userData.username()).isEmpty()) {
+            return new ResponseEntity<>(
+                "username already is in use.", 
+                HttpStatus.BAD_REQUEST
+            );
+        }
+
+        var freeRole = rolesRepo.findAll()
+            .stream()
+            .filter(r -> r.getName().equals("Free"))
+            .findAny();
         
-//         if (user == null)
-//             return ResponseEntity.status(401)
-//                 .body(new AuthResult("Unknow user.", null));
+        if (!freeRole.isPresent()) {
+            return new ResponseEntity<>(
+                "free users cannot be created.", 
+                HttpStatus.BAD_REQUEST
+            );
+        }
         
-//         if (!encoder.matches(data.password(), user.getPassword()))
-//             return ResponseEntity.status(401)
-//                 .body(new AuthResult("Wrong password.", null));
-        
-//         var token = jwt.get(new HashMap<String, Object>(), user.getId());
-//         return ResponseEntity.ok(new AuthResult("successfull login", token));
-//     }
-    
-//     @PostMapping("user")
-//     public ResponseEntity<String> create(@RequestBody User user) {    
-//         if (user.getUsername() == null || user.getUsername().length() < 4) {
-//             return ResponseEntity.badRequest()
-//                 .body("Username is too short."
-//             );
-//         }
+        var securePass = encoder.encode(userData.password());
 
-//         if (!mailValidator.validate(user.getEmail())) {
-//             return ResponseEntity.badRequest()
-//                 .body("Email is too short or invalid."
-//             );
-//         }
+        User user = new User();
+        user.setEmail(userData.email());
+        user.setUsername(userData.username());
+        user.setPassword(securePass);
+        user.setRole(freeRole.get());
+        repo.save(user);
 
-//         if (auth.loginByUsername(user.getUsername()) != null) {
-//             return ResponseEntity.badRequest()
-//                 .body("The username already exists."
-//             );
-//         }
+        return new ResponseEntity<>(
+            "user create successfully",
+            HttpStatus.CREATED
+        );
 
-//         if (auth.loginByEmail(user.getEmail()) != null) {
-//             return ResponseEntity.badRequest()
-//                 .body("The username already exists."
-//             );
-//         }
+    }
 
-//         var password = user.getPassword();
-//         password = encoder.encode(password);
-//         user.setPassword(password);
-        
-//         repo.save(user);
+    @PostMapping("/login")
+    public ResponseEntity<String> create(@RequestBody LoginData loginData) {
 
-//         return ResponseEntity.ok("Usuário cadastrado com sucesso");
-//     }
-// }
+        if (loginData.login() == null || loginData.password() == null) {
+            return new ResponseEntity<>(
+                "login and password are expected.", 
+                HttpStatus.BAD_REQUEST
+            );
+        }
+        var users = repo.login(loginData.login());
+
+        if (users.isEmpty()) {
+            return new ResponseEntity<>(
+                "The user do not exists.", 
+                HttpStatus.UNAUTHORIZED
+            );
+        }
+        var user = users.get(0);
+
+        if (!encoder.matches(loginData.password(), user.getPassword())) {
+            return new ResponseEntity<>(
+                "The password is incorrect.", 
+                HttpStatus.UNAUTHORIZED
+            );
+        }
+
+        return new ResponseEntity<>(
+            "i am a nice jwt!",
+            HttpStatus.OK
+        );
+    }
+
+}
