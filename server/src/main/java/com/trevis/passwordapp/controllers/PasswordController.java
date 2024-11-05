@@ -1,6 +1,5 @@
 package com.trevis.passwordapp.controllers;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +68,7 @@ public class PasswordController {
     }
 
     boolean isSameDay(Date date, Date today) {
-        return  today.after(date) && date.before(today);
+        return date.toString().equals(today.toString());
     }
 
 }
